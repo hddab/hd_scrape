@@ -1,6 +1,6 @@
 # hd_scrape
 Home depot - scrape by category &amp; store, save to .csv
-
+**If you're not located in the US, you'll need a VPN/proxy to access the website
 >scraper_async.py 
 - Run to scrape Appliances-Dishwashers-LG,Samsung/Appliances-Refridgerators-Whirlpool,GE/Furniture-Mattresses-Sealy for Manhattan 59th Street and Lemmon Ave stores.
 
