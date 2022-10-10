@@ -158,7 +158,9 @@ async def get_data(client, store, navParam, startIndex):
     response = await client.post(url, headers=headers, json=payload, params=querystring)
 
     if response.status_code != 200:
-        response_dict = {'store':store, 'navParam':navParam, 'startIndex':startIndex, 'response':{'errors':{'message':response.status_code}}} 
+        response_dict = {'store':store, 'navParam':navParam, 'startIndex':startIndex, 'response':{'errors':{'message':response.status_code}}}
+        print(response_dict)
+        return
     else:
         response_dict = {'store':store, 'navParam':navParam, 'startIndex':startIndex, 'response':response.json()} #Store response in a dictionary along with parameters
     
@@ -224,13 +226,19 @@ def combine_results(stores, categories):
 #run first page (startIndex=0) to get the total number of products
     start_index = [0]
 
-    start_results = asyncio.run(async_request(stores, categories, start_index))
+    start_results = []
+    raw_start_results = asyncio.run(async_request(stores, categories, start_index))
+    for result in raw_start_results:
+        if result == None or 'errors' in result['response']: # error
+            continue
+        elif result['response']['data']['searchModel'] != None and 'products' in result['response']['data']['searchModel']:
+            start_results.appned(result) 
 
     new_runlist = []
 
 #extract all available results
     for result in start_results:
-        if 'errors' in result['response']: # error
+        if result == None or 'errors' in result['response']: # error
             continue
         if len(result['response']['data']['searchModel']['products'])==0: # other error (graphql?)
             continue
@@ -294,7 +302,11 @@ def main(stores, categories):
 
     run_start = datetime.now()
     results = combine_results(stores, categories)
-    results_df = format_results(results)
+    if len(results)>0: #make sure there's no error 
+        results_df = format_results(results)
+    else:
+        print("No data extracted for any store/category. If error 403 - you likely need to connect via VPN/Proxy")
+        return
 
     print('Extract + transform time:')
     print(datetime.now()-run_start)
