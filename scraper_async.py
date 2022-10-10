@@ -232,7 +232,7 @@ def combine_results(stores, categories):
         if result == None or 'errors' in result['response']: # error
             continue
         elif result['response']['data']['searchModel'] != None and 'products' in result['response']['data']['searchModel']:
-            start_results.appned(result) 
+            start_results.append(result) 
 
     new_runlist = []
 
